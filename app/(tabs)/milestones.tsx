@@ -89,7 +89,7 @@ export default function MilestonesScreen() {
         {/* Liste des jalons */}
         {state.milestonesReached.length > 0 ? (
           <FlatList
-            data={[...state.milestonesReached].reverse()}
+            data={state.milestonesReached}
             renderItem={renderMilestoneItem}
             keyExtractor={(item, index) => `${item.id}-${index}`}
             scrollEnabled={false}
