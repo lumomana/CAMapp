@@ -140,3 +140,6 @@ Pour toute question ou suggestion, consultez la documentation CAM officielle sur
 ---
 
 **Parcourez 1 million d'années d'histoire. Découvrez nos origines. Comprenez notre présent.**
+liens pour télécharger l'apk de cette version "archéologic only" / 14 avril 2027 :
+https://www.librairiemobile.org/timeline/CAMapp.apk
+https://mega.nz/file/NN5QzZrS#ZeBD99btXwOu2EbbCKjjD_-ftltqU-lrZLc5udzcC1Y
