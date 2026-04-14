@@ -1,13 +1,16 @@
-import { ScrollView, Text, View, TouchableOpacity, Pressable } from "react-native";
+import { ScrollView, Text, View, ImageBackground } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
-import { usePedometer } from "@/hooks/use-pedometer";
+import { usePedometerContext as usePedometer } from "@/lib/pedometer-context";
 import { useMilestoneAlerts } from "@/hooks/use-milestone-alerts";
 import { useColors } from "@/hooks/use-colors";
 import { useState, useEffect } from "react";
 import { Svg, Circle } from "react-native-svg";
 
+// URL CDN de l'image d'artefact archéologique
+const ARTIFACT_IMAGE_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663402291429/aUnfUTG5yx838KHmhDMMCR/artifact-background_4c7a51a9.jpg";
+
 /**
- * Composant de compteur circulaire animé
+ * Composant de compteur circulaire animé avec image de fond
  */
 function StepCounter({ steps, totalSteps, distance, totalDistance }: any) {
   const colors = useColors();
@@ -18,32 +21,62 @@ function StepCounter({ steps, totalSteps, distance, totalDistance }: any) {
 
   return (
     <View className="items-center justify-center gap-4">
-      <Svg width={200} height={200} viewBox="0 0 200 200">
-        {/* Cercle de fond */}
-        <Circle cx="100" cy="100" r={radius} stroke={colors.border} strokeWidth="4" fill="none" />
-        {/* Cercle de progression */}
-        <Circle
-          cx="100"
-          cy="100"
-          r={radius}
-          stroke={colors.primary}
-          strokeWidth="6"
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          transform="rotate(-90 100 100)"
+      {/* Conteneur avec image de fond */}
+      <ImageBackground
+        source={{ uri: ARTIFACT_IMAGE_URL }}
+        style={{
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          overflow: "hidden",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        imageStyle={{ borderRadius: 100 }}
+      >
+        {/* Overlay semi-transparent pour la lisibilité */}
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            borderRadius: 100,
+          }}
         />
-      </Svg>
+        
+        {/* SVG avec cercles */}
+        <Svg width={200} height={200} viewBox="0 0 200 200" style={{ position: "absolute" }}>
+          {/* Cercle de fond */}
+          <Circle cx="100" cy="100" r={radius} stroke={colors.border} strokeWidth="4" fill="none" />
+          {/* Cercle de progression */}
+          <Circle
+            cx="100"
+            cy="100"
+            r={radius}
+            stroke={colors.primary}
+            strokeWidth="6"
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            transform="rotate(-90 100 100)"
+          />
+        </Svg>
 
-      {/* Texte au centre */}
-      <View className="absolute items-center justify-center">
-        <Text className="text-5xl font-bold text-primary">{steps.toLocaleString()}</Text>
-        <Text className="text-sm text-muted">pas</Text>
-        <Text className="text-xs text-muted mt-2">
-          {distance.toFixed(1)} m / {totalDistance.toFixed(0)} m
-        </Text>
-      </View>
+        {/* Texte au centre */}
+        <View className="items-center justify-center z-10">
+          <Text className="text-5xl font-bold text-white" style={{ textShadowColor: "rgba(0, 0, 0, 0.75)", textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
+            {steps.toLocaleString()}
+          </Text>
+          <Text className="text-sm text-white" style={{ textShadowColor: "rgba(0, 0, 0, 0.75)", textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
+            pas
+          </Text>
+          <Text className="text-xs text-white mt-2" style={{ textShadowColor: "rgba(0, 0, 0, 0.75)", textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
+            {distance.toFixed(1)} m / {totalDistance.toFixed(0)} m
+          </Text>
+        </View>
+      </ImageBackground>
     </View>
   );
 }
@@ -53,11 +86,9 @@ function StepCounter({ steps, totalSteps, distance, totalDistance }: any) {
  */
 export default function HomeScreen() {
   const colors = useColors();
-  const { state, settings, currentPeriod, nextMilestone, isPedometerAvailable, toggleWalking, reset } =
+  const { state, settings, currentPeriod, nextMilestone, isPedometerAvailable } =
     usePedometer();
   const { triggerAlert } = useMilestoneAlerts(settings);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-
   // Déclencher les alertes quand un jalon est atteint
   useEffect(() => {
     if (state.milestonesReached.length > 0) {
@@ -65,11 +96,6 @@ export default function HomeScreen() {
       triggerAlert(lastMilestone);
     }
   }, [state.milestonesReached.length, triggerAlert]);
-
-  const handleReset = async () => {
-    await reset();
-    setShowResetConfirm(false);
-  };
 
   return (
     <ScreenContainer className="p-6">
@@ -145,49 +171,7 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Boutons d'action */}
-          <View className="gap-3 mt-4">
-            <TouchableOpacity
-              onPress={toggleWalking}
-              className={`py-4 rounded-xl items-center justify-center ${
-                state.isWalking ? "bg-error" : "bg-primary"
-              }`}
-            >
-              <Text className="text-white font-semibold text-base">
-                {state.isWalking ? "⏸ Arrêter" : "▶ Démarrer la marche"}
-              </Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => setShowResetConfirm(true)}
-              className="py-3 rounded-xl items-center justify-center border border-border"
-            >
-              <Text className="text-foreground font-semibold text-sm">↻ Réinitialiser</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Confirmation de réinitialisation */}
-          {showResetConfirm && (
-            <View className="bg-surface rounded-2xl p-4 border border-error gap-3">
-              <Text className="text-sm font-semibold text-foreground">
-                Êtes-vous sûr ? Cela supprimera tous les pas et jalons atteints.
-              </Text>
-              <View className="flex-row gap-2">
-                <TouchableOpacity
-                  onPress={() => setShowResetConfirm(false)}
-                  className="flex-1 py-2 rounded-lg border border-border items-center"
-                >
-                  <Text className="text-foreground font-semibold">Annuler</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleReset}
-                  className="flex-1 py-2 rounded-lg bg-error items-center"
-                >
-                  <Text className="text-white font-semibold">Réinitialiser</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
         </View>
       </ScrollView>
     </ScreenContainer>

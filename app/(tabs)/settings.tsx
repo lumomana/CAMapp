@@ -1,8 +1,9 @@
-import { ScrollView, Text, View, TouchableOpacity, Switch } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Switch, Linking } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
-import { usePedometer } from "@/hooks/use-pedometer";
+import { usePedometerContext as usePedometer } from "@/lib/pedometer-context";
 import { useColors } from "@/hooks/use-colors";
 import { useState } from "react";
+import { useThemeContext, type ThemePreference } from "@/lib/theme-provider";
 import Slider from "@react-native-community/slider";
 
 /**
@@ -10,8 +11,13 @@ import Slider from "@react-native-community/slider";
  */
 export default function SettingsScreen() {
   const colors = useColors();
-  const { settings, updateSettings, reset } = usePedometer();
+  const { settings, updateSettings, reset, changeChronology } = usePedometer();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const { themePreference, setThemePreference } = useThemeContext();
+
+  const handleChronologyChange = (chronologyId: number) => {
+    changeChronology(chronologyId);
+  };
 
   const handleDistanceChange = (value: number) => {
     updateSettings({ totalDistance: value });
@@ -48,6 +54,42 @@ export default function SettingsScreen() {
             <Text className="text-sm text-muted">Personnalisez votre expérience</Text>
           </View>
 
+          {/* Section Thème */}
+          <View className="bg-surface rounded-2xl p-4 border border-border gap-4">
+            <Text className="text-lg font-semibold text-foreground">Thème</Text>
+            <View className="flex-row gap-2">
+              {([
+                { value: "light", label: "☀️ Clair" },
+                { value: "auto",  label: "🌗 Auto" },
+                { value: "dark",  label: "🌙 Sombre" },
+              ] as { value: ThemePreference; label: string }[]).map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  onPress={() => setThemePreference(option.value)}
+                  style={{ flex: 1 }}
+                  className={`py-3 rounded-xl items-center border-2 ${
+                    themePreference === option.value
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-background"
+                  }`}
+                >
+                  <Text className={`text-sm font-semibold ${
+                    themePreference === option.value ? "text-primary" : "text-foreground"
+                  }`}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text className="text-xs text-muted">
+              {themePreference === "auto"
+                ? "Suit automatiquement le thème du système"
+                : themePreference === "dark"
+                ? "Mode sombre activé"
+                : "Mode clair activé"}
+            </Text>
+          </View>
+
           {/* Section Distance */}
           <View className="bg-surface rounded-2xl p-4 border border-border gap-4">
             <Text className="text-lg font-semibold text-foreground">Distance totale</Text>
@@ -56,30 +98,35 @@ export default function SettingsScreen() {
             </Text>
 
             <View className="gap-3">
-              {[100, 500, 1000, 2000].map((distance) => (
+              {[
+                { dist: 100.2,    label: "Sprint",      sub: "100m" },
+                { dist: 501,      label: "Balade",      sub: "500m" },
+                { dist: 1002.050, label: "Promenade",   sub: "1km" },
+                { dist: 2004.1,   label: "Randonnée",   sub: "2km" },
+              ].map((option) => (
                 <TouchableOpacity
-                  key={distance}
-                  onPress={() => handleDistanceChange(distance)}
+                  key={option.dist}
+                  onPress={() => handleDistanceChange(option.dist)}
                   className={`py-3 px-4 rounded-lg border-2 items-center ${
-                    settings.totalDistance === distance
+                    Math.abs(settings.totalDistance - option.dist) < 0.5
                       ? `border-primary bg-primary/10`
                       : `border-border bg-background`
                   }`}
                 >
                   <Text
                     className={`font-semibold ${
-                      settings.totalDistance === distance ? "text-primary" : "text-foreground"
+                      Math.abs(settings.totalDistance - option.dist) < 0.5 ? "text-primary" : "text-foreground"
                     }`}
                   >
-                    {distance} mètres
+                    {option.label}
                   </Text>
+                  <Text className="text-xs text-muted mt-1">{option.sub}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text className="text-xs text-muted mt-2">
-              Actuellement : {settings.totalDistance}m = 1 million d'années
-            </Text>
+
+
           </View>
 
           {/* Section Son */}
@@ -157,30 +204,34 @@ export default function SettingsScreen() {
 
             <View className="gap-2">
               {[
-                { id: 1, name: "Chronologie Archéologique Marchée", active: true },
-                { id: 2, name: "Chronologie 2", active: false },
-                { id: 3, name: "Chronologie 3", active: false },
-                { id: 4, name: "Chronologie 4", active: false },
-                { id: 5, name: "Chronologie 5", active: false },
-              ].map((chrono) => (
-                <TouchableOpacity
-                  key={chrono.id}
-                  className={`py-3 px-4 rounded-lg border-2 flex-row items-center justify-between ${
-                    chrono.active
-                      ? `border-primary bg-primary/10`
-                      : `border-border bg-background`
-                  }`}
-                >
-                  <Text
-                    className={`font-medium ${
-                      chrono.active ? "text-primary" : "text-foreground"
+                { id: 1, name: "Chronologie Archéologique Marchée" },
+                { id: 2, name: "Photographie" },
+                { id: 3, name: "Chronologie 3" },
+                { id: 4, name: "Chronologie 4" },
+                { id: 5, name: "Chronologie 5" },
+              ].map((chrono) => {
+                const isActive = settings.chronologyId === chrono.id;
+                return (
+                  <TouchableOpacity
+                    key={chrono.id}
+                    onPress={() => handleChronologyChange(chrono.id)}
+                    className={`py-3 px-4 rounded-lg border-2 flex-row items-center justify-between ${
+                      isActive
+                        ? `border-primary bg-primary/10`
+                        : `border-border bg-background`
                     }`}
                   >
-                    {chrono.name}
-                  </Text>
-                  {chrono.active && <Text className="text-primary font-bold">✓</Text>}
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      className={`font-medium ${
+                        isActive ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      {chrono.name}
+                    </Text>
+                    {isActive && <Text className="text-primary font-bold">✓</Text>}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
             <TouchableOpacity className="py-3 px-4 rounded-lg bg-primary/10 border border-primary items-center mt-2">
@@ -205,11 +256,26 @@ export default function SettingsScreen() {
                 <Text className="text-sm text-foreground font-semibold">1M d'années</Text>
               </View>
             </View>
-            <Text className="text-xs text-muted mt-2">
-              Chronologie Archéologique Marchée synchronise votre marche avec l'histoire.
+            <Text className="text-xs text-muted mt-2 leading-relaxed">
+              Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
             </Text>
-            <Text className="text-xs text-muted">
-              - par lumomana
+            <View className="gap-1 mt-1">
+              <Text className="text-xs text-muted">📜 Crédits CAM : David Vial</Text>
+              <Text className="text-xs text-muted">⏱️ Mise en chronologie : Tiki-Toki Timeline</Text>
+              <Text className="text-xs text-muted">🎶 Sons : freesound.org</Text>
+              <Text className="text-xs text-muted">🎨 Design : Inspiré par les principes HIG d'Apple</Text>
+              <Text className="text-xs text-muted">💻 Conception & développement : lumomana</Text>
+              <Text className="text-xs text-muted">👩🏾‍💻🤖 avec la complicité de Claude & Manus</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => Linking.openURL("https://librairiemobile.org/feuilleCAM.html")}
+              className="mt-2 py-3 px-4 rounded-lg bg-primary/10 border border-primary items-center"
+            >
+              <Text className="text-primary font-semibold">📚 Consulter la documentation</Text>
+              <Text className="text-xs text-primary mt-1">https://librairiemobile.org/feuilleCAM.html</Text>
+            </TouchableOpacity>
+            <Text className="text-xs text-primary font-semibold mt-1 leading-relaxed">
+              Parcourez 1 million d'années d'histoire. Découvrez nos origines. Comprenez notre présent.
             </Text>
           </View>
 
@@ -219,13 +285,13 @@ export default function SettingsScreen() {
               onPress={() => setShowResetConfirm(true)}
               className="py-3 px-4 rounded-lg bg-error/10 border border-error items-center"
             >
-              <Text className="text-error font-semibold">🗑️ Réinitialiser les données</Text>
+              <Text className="text-error font-semibold">🗑️ Remettre à zéro (pas, distance et jalons)</Text>
             </TouchableOpacity>
 
             {showResetConfirm && (
               <View className="bg-surface rounded-2xl p-4 border border-error gap-3">
                 <Text className="text-sm font-semibold text-foreground">
-                  Êtes-vous sûr ? Cela supprimera tous les pas et jalons atteints.
+                  Cela remettra à zéro tous vos pas, votre distance et tous les jalons atteints.
                 </Text>
                 <View className="flex-row gap-2">
                   <TouchableOpacity

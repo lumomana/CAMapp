@@ -36,6 +36,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="walking"
+        options={{
+          title: "Marche",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="figure.walk" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="milestones"
         options={{
           title: "Jalons",

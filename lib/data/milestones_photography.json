@@ -1,0 +1,581 @@
+{
+  "title": "Photographie",
+  "description": "Histoire de la photographie - de la Camera Obscura à la numérisation",
+  "total_distance_m": 2.39,
+  "start_year": -400,
+  "end_year": 1990,
+  "milestones": [
+    {
+      "id": 20600243,
+      "title": "Aristote",
+      "start_date": {
+        "year": 400,
+        "era": "BC",
+        "years_bp": 400,
+        "date_str": "0400 BC-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 400,
+        "era": "BC",
+        "years_bp": 400,
+        "date_str": "0400 BC-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Aristote découvre que la lumière du jour entrant par un petit trou aménagé dans le mur d'une pièce obscure projette sur le mur d'en face l'image inversée de tous les objets placés à l'extérieur, devant cet orifice.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 0.0
+    },
+    {
+      "id": 20600244,
+      "title": "Al-Hazen",
+      "start_date": {
+        "year": 1000,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1000-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1000,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1000-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "le mathématicien arabe Al-Hazen parle pour la première fois de \"chambre noire\".",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 1.4
+    },
+    {
+      "id": 20600245,
+      "title": "Léonard de Vinci",
+      "start_date": {
+        "year": 1515,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1515-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1515,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1515-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Léonard de Vinci décrit la Camera Oscura",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 1.915
+    },
+    {
+      "id": 20600247,
+      "title": "tentatives de réactions photochimiques",
+      "start_date": {
+        "year": 1700,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1700-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1700,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1700-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "De nombreux savants étudient les réactions photochimiques sans parvenir à fixer l'image de la chambre noire.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.1
+    },
+    {
+      "id": 20600248,
+      "title": "Nicéphore NIepce",
+      "start_date": {
+        "year": 1816,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1816-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1816,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1816-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "premières images de Nicéphore NIepce sur papier au chlorure d'argent fixées à l'acide nitrique, mais elles sont négatives.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.216
+    },
+    {
+      "id": 20600249,
+      "title": "première photo connue",
+      "start_date": {
+        "year": 1827,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1827-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1827,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1827-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Niepce réalise la photo la plus ancienne connue : avec sa chambre noire il réussit à fixer sur une plaque d'étain, revêtue d'une solution de bitume de Judée et d'essence de lavande, la vue qu'il a depuis sa fenêtre. Le temps de pose est de huit heures. ",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.227
+    },
+    {
+      "id": 20600250,
+      "title": "Jacques Daguerre",
+      "start_date": {
+        "year": 1834,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1834-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1834,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1834-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "sur la base des travaux de Niepce, Jacques Daguerre met au point son \"daguerréotype\" : un procédé qui donne un positif direct unique. Temps de pose : une à deux minutes.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.234
+    },
+    {
+      "id": 20600251,
+      "title": "Arago",
+      "start_date": {
+        "year": 1839,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1839-01-07 00:00:00"
+      },
+      "end_date": {
+        "year": 1839,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1839-01-07 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Le 7 janvier, Arago fait une communication officielle à l'Académie Française sur le procédé de Daguerre. Quelques mois plus tard, l'état français acquerra l'invention \"pour en faire don au monde.\" ",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.239
+    },
+    {
+      "id": 20600252,
+      "title": "Fox Talbot",
+      "start_date": {
+        "year": 1839,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1839-01-31 00:00:00"
+      },
+      "end_date": {
+        "year": 1839,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1839-01-31 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Le 31 janvier, l'anglais Fox Talbot publie les résultats de ses propres travaux, qui le mèneront deux ans plus trad à la mise au point du calotype : premier négatif sur papier, qui peut être reproduit en positif un nombre illimité de fois. C'est ce principe de transfert négatif-positif qui va dominer l'avenir de la photographie.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.239
+    },
+    {
+      "id": 20600253,
+      "title": "la Lune",
+      "start_date": {
+        "year": 1850,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1850-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1850,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1850-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "vers 1850 apparaissent les premières photos de la Lune",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.25
+    },
+    {
+      "id": 20600254,
+      "title": "usages du collodion",
+      "start_date": {
+        "year": 1851,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1851-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1851,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1851-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "mise au point de la méthode au collodion humide (plaque négative en verre) puis au collodion sec : les images produites sont très fines et le temps de pose est réduit à quelques secondes. ",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.251
+    },
+    {
+      "id": 20600255,
+      "title": "Nadar",
+      "start_date": {
+        "year": 1858,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1858-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1858,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1858-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Nadar réalise la première photo aérienne à bord d'une mongolfière",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.258
+    },
+    {
+      "id": 20600256,
+      "title": "Maddox",
+      "start_date": {
+        "year": 1874,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1874-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1874,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1874-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "les travaux de l'anglais Maddox sur les papiers au gélatino-bromure d'argent vont accélérer le transfert positif-négatif.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.274
+    },
+    {
+      "id": 20600257,
+      "title": "Muybridge",
+      "start_date": {
+        "year": 1878,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1878-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1878,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1878-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "aux états-unis, Muybridge réussit à fixer le mouvement d'un cheval au galop avec 40 appareils se déclenchant les uns après les autres.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.278
+    },
+    {
+      "id": 20600258,
+      "title": "celluloïd",
+      "start_date": {
+        "year": 1884,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1884-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1884,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1884-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Le celluloïd (film transparent) est utilisé comme support des émulsions photographiques.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.284
+    },
+    {
+      "id": 20600259,
+      "title": "Kodak",
+      "start_date": {
+        "year": 1888,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1888-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1888,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1888-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "lancement du premier Kodak par Eastman aux états-unis. Premier appareil conçu pour employer un film souple.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.288
+    },
+    {
+      "id": 20600260,
+      "title": "Edison",
+      "start_date": {
+        "year": 1892,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1892-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1892,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1892-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Edison réalise le kinétoscope, premier film à déroulement continu (16 images/seconde) pour un seul spectateur à la fois.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.292
+    },
+    {
+      "id": 20600261,
+      "title": "les frères Lumière",
+      "start_date": {
+        "year": 1895,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1895-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1895,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1895-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "invention du cinématographe par Louis et Auguste Lumière. ",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.295
+    },
+    {
+      "id": 20600262,
+      "title": "l'autochrome",
+      "start_date": {
+        "year": 1907,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1907-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1907,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1907-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "les frères Lumière innovent avec l'autochrome, procédé photographique en couleurs. ",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.307
+    },
+    {
+      "id": 20600263,
+      "title": "Leica",
+      "start_date": {
+        "year": 1925,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1925-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1925,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1925-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "L'entreprise allemande Leitz propose le premier appareil portatif perfectionné : le Leica.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.325
+    },
+    {
+      "id": 20600264,
+      "title": "perfectionnements",
+      "start_date": {
+        "year": 1939,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1939-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1939,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1939-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "perfectionnements du flash, du viseur reflex, des objectifs à focales et à ouvertures variables ; le matériel devient plus facile à transporter",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.339
+    },
+    {
+      "id": 20600265,
+      "title": "Gabor",
+      "start_date": {
+        "year": 1947,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1947-01-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1947,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1947-01-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "l'anglais Gabor conçoit l'holographie, la photographie en relief.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.347
+    },
+    {
+      "id": 20600266,
+      "title": "Polaroïd",
+      "start_date": {
+        "year": 1947,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1947-06-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1947,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1947-06-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "Land met au point aux états-unis le développement instantané : le polaroïd",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.347
+    },
+    {
+      "id": 20600267,
+      "title": "compact autofocus",
+      "start_date": {
+        "year": 1977,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1977-06-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1977,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1977-06-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "premier appareil à réglages automatiques",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.377
+    },
+    {
+      "id": 20600269,
+      "title": "papier photo longue durée",
+      "start_date": {
+        "year": 1984,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1984-06-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1984,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1984-06-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "mise au point du papier photographique à longévité supérieure  à 100 ans.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.384
+    },
+    {
+      "id": 20600270,
+      "title": "numérisation",
+      "start_date": {
+        "year": 1990,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1990-06-01 00:00:00"
+      },
+      "end_date": {
+        "year": 1990,
+        "era": "AD",
+        "years_bp": 0,
+        "date_str": "1990-06-01 00:00:00"
+      },
+      "intro": "",
+      "full_text": "invention du disque compact photo : premier système de numérisation des photos pour le grand public.",
+      "category": "Photographie",
+      "external_link": "",
+      "images": "",
+      "distance_m": 2.39
+    }
+  ]
+}

@@ -37,6 +37,7 @@ export interface AppSettings {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
   distanceUnit: "m" | "km"; // mètres ou kilomètres
+  chronologyId: number; // 1 = CAM, 2 = Photographie, etc.
 }
 
 export interface PeriodInfo {

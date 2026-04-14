@@ -2,239 +2,243 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Pedometer } from "expo-sensors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Milestone, PedometerState, AppSettings, PeriodInfo } from "@/lib/types/milestone";
-import milestonesData from "@/lib/data/milestones.json";
+import milestonesCAM from "@/lib/data/milestones.json";
+import milestonesPhotography from "@/lib/data/milestones_photography.json";
+
+// Map des chronologies disponibles
+const CHRONOLOGIES: Record<number, { data: any; baseDistance: number; title: string }> = {
+  1: { data: milestonesCAM, baseDistance: 1002.050, title: "CAM" },
+  2: { data: milestonesPhotography, baseDistance: 2.39, title: "Photographie" },
+};
+
+let currentChronology = CHRONOLOGIES[1];
+
+// Fonction pour obtenir les jalons de la chronologie actuelle
+function getMilestones(): Milestone[] {
+  const data = currentChronology.data;
+  // CAM est un tableau direct, Photographie est un objet avec propriété milestones
+  return Array.isArray(data) ? data : (data.milestones as Milestone[]);
+}
+
+// Distance de référence : sera définie selon la chronologie sélectionnée
+// Toutes les distance_m du JSON sont calculées sur cette base
+function getBaseDistance(): number {
+  return currentChronology.baseDistance;
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
-  totalDistance: 1000, // 1000 mètres = 1 million d'années
+  totalDistance: 1002.050,
   soundVolume: 0.8,
   vibrationIntensity: 0.8,
   soundEnabled: true,
   vibrationEnabled: true,
   distanceUnit: "m",
+  chronologyId: 1,
 };
 
-const STORAGE_KEYS = {
-  PEDOMETER_STATE: "cam_pedometer_state",
-  APP_SETTINGS: "cam_app_settings",
-  MILESTONES_REACHED: "cam_milestones_reached",
+const KEYS = {
+  STATE: "cam_pedometer_state",
+  SETTINGS: "cam_app_settings",
+  MILESTONES: "cam_milestones_reached",
 };
 
-/**
- * Hook principal pour gérer la logique du podomètre CAM
- */
+// Convertit une distance JSON vers la distance réelle
+// selon le totalDistance choisi par l'utilisateur
+function scaleDistance(distanceJson: number, totalDistance: number): number {
+  return (distanceJson / getBaseDistance()) * totalDistance;
+}
+
 export function usePedometer() {
-  const [state, setState] = useState<PedometerState>({
-    totalSteps: 0,
-    currentDistance: 0,
-    isWalking: false,
-    milestonesReached: [],
-    lastUpdateTime: Date.now(),
-  });
-
+  const [totalSteps, setTotalSteps] = useState(0);
+  const [currentDistance, setCurrentDistance] = useState(0);
+  const [isWalking, setIsWalking] = useState(false);
+  const [milestonesReached, setMilestonesReached] = useState<Milestone[]>([]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const [currentPeriod, setCurrentPeriod] = useState<PeriodInfo | null>(null);
-  const [nextMilestone, setNextMilestone] = useState<Milestone | null>(null);
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
 
-  const previousStepsRef = useRef(0);
-  const previousDistanceRef = useRef(0);
-  const milestonesTriggeredRef = useRef<Set<number>>(new Set());
+  const distanceRef = useRef(0);
+  const stepsRef = useRef(0);
+  const triggeredRef = useRef<Set<number>>(new Set());
   const subscriptionRef = useRef<any>(null);
+  const settingsRef = useRef(DEFAULT_SETTINGS);
 
-  // Charger les données sauvegardées au démarrage
   useEffect(() => {
-    const loadData = async () => {
+    settingsRef.current = settings;
+  }, [settings]);
+
+  // Charger les données au démarrage
+  useEffect(() => {
+    const load = async () => {
       try {
-        // Vérifier la disponibilité du podomètre
         const available = await Pedometer.isAvailableAsync();
         setIsPedometerAvailable(available);
 
-        // Charger les paramètres
-        const savedSettings = await AsyncStorage.getItem(STORAGE_KEYS.APP_SETTINGS);
+        const savedSettings = await AsyncStorage.getItem(KEYS.SETTINGS);
         if (savedSettings) {
-          setSettings(JSON.parse(savedSettings));
+          const parsed = JSON.parse(savedSettings);
+          setSettings(parsed);
+          settingsRef.current = parsed;
+          if (parsed.chronologyId && CHRONOLOGIES[parsed.chronologyId]) {
+            currentChronology = CHRONOLOGIES[parsed.chronologyId];
+          }
         }
 
-        // Charger l'état du podomètre
-        const savedState = await AsyncStorage.getItem(STORAGE_KEYS.PEDOMETER_STATE);
+        const savedState = await AsyncStorage.getItem(KEYS.STATE);
         if (savedState) {
-          const parsedState = JSON.parse(savedState);
-          setState(parsedState);
-          previousStepsRef.current = parsedState.totalSteps;
-          previousDistanceRef.current = parsedState.currentDistance;
+          const s = JSON.parse(savedState);
+          setTotalSteps(s.totalSteps || 0);
+          setCurrentDistance(s.currentDistance || 0);
+          distanceRef.current = s.currentDistance || 0;
+          stepsRef.current = s.totalSteps || 0;
         }
 
-        // Charger les jalons atteints
-        const savedMilestones = await AsyncStorage.getItem(STORAGE_KEYS.MILESTONES_REACHED);
+        const savedMilestones = await AsyncStorage.getItem(KEYS.MILESTONES);
         if (savedMilestones) {
-          const milestones = JSON.parse(savedMilestones);
-          setState((prev) => ({ ...prev, milestonesReached: milestones }));
-          milestonesTriggeredRef.current = new Set(milestones.map((m: Milestone) => m.id));
+          const ms = JSON.parse(savedMilestones);
+          setMilestonesReached(ms);
+          triggeredRef.current = new Set(ms.map((m: Milestone) => m.id));
         }
-      } catch (error) {
-        console.error("Error loading saved data:", error);
+      } catch (e) {
+        console.error("Error loading data:", e);
       }
     };
-
-    loadData();
+    load();
   }, []);
 
-  // S'abonner aux mises à jour du podomètre
-  useEffect(() => {
-    if (!isPedometerAvailable || !state.isWalking) return;
+  // Vérifier les jalons — les distances JSON sont recalculées selon totalDistance
+  const checkMilestones = useCallback((distance: number) => {
+    const total = settingsRef.current.totalDistance;
+    const newlyReached: Milestone[] = [];
 
-    const subscribe = async () => {
-      try {
-        subscriptionRef.current = Pedometer.watchStepCount((result) => {
-          const newSteps = result.steps;
-          const stepsDifference = newSteps - previousStepsRef.current;
-
-          if (stepsDifference > 0) {
-            // 1 pas ≈ 0.75 mètre
-            const distanceAdded = stepsDifference * 0.75;
-            const newDistance = previousDistanceRef.current + distanceAdded;
-            const normalizedDistance = Math.min(newDistance, settings.totalDistance);
-
-            setState((prev) => ({
-              ...prev,
-              totalSteps: newSteps,
-              currentDistance: normalizedDistance,
-              lastUpdateTime: Date.now(),
-            }));
-
-            previousStepsRef.current = newSteps;
-            previousDistanceRef.current = normalizedDistance;
-
-            // Vérifier les jalons atteints
-            checkMilestones(normalizedDistance);
-
-            // Sauvegarder l'état
-            saveState({
-              totalSteps: newSteps,
-              currentDistance: normalizedDistance,
-              isWalking: true,
-              milestonesReached: state.milestonesReached,
-              lastUpdateTime: Date.now(),
-            });
-          }
-        });
-      } catch (error) {
-        console.error("Error subscribing to pedometer:", error);
+    getMilestones().forEach((m: Milestone) => {
+      // Recalcul proportionnel : position du jalon selon la distance choisie
+      const scaledDistance = scaleDistance(m.distance_m, total);
+      if (distance >= scaledDistance && !triggeredRef.current.has(m.id)) {
+        triggeredRef.current.add(m.id);
+        newlyReached.push(m);
       }
-    };
+    });
 
-    subscribe();
+    if (newlyReached.length > 0) {
+      setMilestonesReached((prev) => {
+        const updated = [...prev, ...newlyReached];
+        AsyncStorage.setItem(KEYS.MILESTONES, JSON.stringify(updated));
+        return updated;
+      });
+    }
+  }, []);
+
+  // Abonnement au podomètre
+  useEffect(() => {
+    if (!isPedometerAvailable || !isWalking) return;
+
+    subscriptionRef.current = Pedometer.watchStepCount((result) => {
+      const diff = result.steps - stepsRef.current;
+      if (diff <= 0) return;
+
+      const newDistance = Math.min(
+        distanceRef.current + diff * 0.75,
+        settingsRef.current.totalDistance
+      );
+      const newSteps = stepsRef.current + diff;
+
+      stepsRef.current = newSteps;
+      distanceRef.current = newDistance;
+
+      setTotalSteps(newSteps);
+      setCurrentDistance(newDistance);
+      checkMilestones(newDistance);
+
+      AsyncStorage.setItem(KEYS.STATE, JSON.stringify({
+        totalSteps: newSteps,
+        currentDistance: newDistance,
+        isWalking: true,
+        milestonesReached: [],
+        lastUpdateTime: Date.now(),
+      }));
+    });
 
     return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.remove();
-      }
+      subscriptionRef.current?.remove();
     };
-  }, [isPedometerAvailable, state.isWalking, settings.totalDistance, state.milestonesReached]);
+  }, [isPedometerAvailable, isWalking, checkMilestones]);
 
-  // Vérifier si des jalons ont été atteints
-  const checkMilestones = useCallback(
-    (currentDistance: number) => {
-      const milestones = milestonesData as Milestone[];
+  // Simulation de pas (émulateur/web)
+  const addSimulatedSteps = useCallback((steps: number) => {
+    const newDistance = Math.min(
+      distanceRef.current + steps * 0.75,
+      settingsRef.current.totalDistance
+    );
+    const newSteps = stepsRef.current + steps;
 
-      milestones.forEach((milestone: Milestone) => {
-        if (
-          currentDistance >= milestone.distance_m &&
-          !milestonesTriggeredRef.current.has(milestone.id)
-        ) {
-          // Jalon atteint !
-          milestonesTriggeredRef.current.add(milestone.id);
+    stepsRef.current = newSteps;
+    distanceRef.current = newDistance;
 
-          setState((prev) => ({
-            ...prev,
-            milestonesReached: [...prev.milestonesReached, milestone],
-          }));
+    setTotalSteps(newSteps);
+    setCurrentDistance(newDistance);
+    checkMilestones(newDistance);
 
-          // Sauvegarder les jalons atteints
-          saveMilestonesReached([...state.milestonesReached, milestone]);
-
-          // Déclencher les alertes (à implémenter dans un hook séparé)
-          triggerMilestoneAlert(milestone);
-        }
-      });
-    },
-    [state.milestonesReached]
-  );
-
-  // Déclencher une alerte de jalon
-  const triggerMilestoneAlert = (milestone: Milestone) => {
-    // Cette fonction sera appelée par un hook d'alertes séparé
-    console.log("Milestone reached:", milestone.title);
-  };
-
-  // Calculer la période actuelle
-  useEffect(() => {
-    const period = calculateCurrentPeriod(state.currentDistance, settings.totalDistance);
-    setCurrentPeriod(period);
-
-    // Trouver le prochain jalon
-    const next = findNextMilestone(state.currentDistance);
-    setNextMilestone(next);
-  }, [state.currentDistance, settings.totalDistance]);
-
-  // Sauvegarder l'état
-  const saveState = async (newState: PedometerState) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.PEDOMETER_STATE, JSON.stringify(newState));
-    } catch (error) {
-      console.error("Error saving state:", error);
-    }
-  };
-
-  // Sauvegarder les jalons atteints
-  const saveMilestonesReached = async (milestones: Milestone[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.MILESTONES_REACHED, JSON.stringify(milestones));
-    } catch (error) {
-      console.error("Error saving milestones:", error);
-    }
-  };
-
-  // Démarrer/arrêter la marche
-  const toggleWalking = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      isWalking: !prev.isWalking,
-    }));
-  }, []);
-
-  // Réinitialiser les données
-  const reset = useCallback(async () => {
-    setState({
-      totalSteps: 0,
-      currentDistance: 0,
+    AsyncStorage.setItem(KEYS.STATE, JSON.stringify({
+      totalSteps: newSteps,
+      currentDistance: newDistance,
       isWalking: false,
       milestonesReached: [],
       lastUpdateTime: Date.now(),
-    });
+    }));
+  }, [checkMilestones]);
 
-    previousStepsRef.current = 0;
-    previousDistanceRef.current = 0;
-    milestonesTriggeredRef.current.clear();
-
-    try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.PEDOMETER_STATE,
-        STORAGE_KEYS.MILESTONES_REACHED,
-      ]);
-    } catch (error) {
-      console.error("Error resetting data:", error);
-    }
+  const toggleWalking = useCallback(() => {
+    setIsWalking((prev) => !prev);
   }, []);
 
-  // Mettre à jour les paramètres
+  const reset = useCallback(async () => {
+    setTotalSteps(0);
+    setCurrentDistance(0);
+    setIsWalking(false);
+    setMilestonesReached([]);
+    distanceRef.current = 0;
+    stepsRef.current = 0;
+    triggeredRef.current.clear();
+    await AsyncStorage.multiRemove([KEYS.STATE, KEYS.MILESTONES]);
+  }, []);
+
   const updateSettings = useCallback(async (newSettings: Partial<AppSettings>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
-      AsyncStorage.setItem(STORAGE_KEYS.APP_SETTINGS, JSON.stringify(updated));
+      settingsRef.current = updated;
+      // Reset les jalons déclenchés pour recalculer avec la nouvelle distance
+      triggeredRef.current.clear();
+      AsyncStorage.setItem(KEYS.SETTINGS, JSON.stringify(updated));
       return updated;
     });
   }, []);
+
+  // Calculs dérivés — positions recalculées selon totalDistance
+  const currentPeriod = calculateCurrentPeriod(currentDistance, settings.totalDistance);
+  const nextMilestone = findNextMilestone(currentDistance, settings.totalDistance);
+
+  const state: PedometerState = {
+    totalSteps,
+    currentDistance,
+    isWalking,
+    milestonesReached,
+    lastUpdateTime: Date.now(),
+  };
+
+  const changeChronology = useCallback((chronologyId: number) => {
+    const chrono = CHRONOLOGIES[chronologyId];
+    if (!chrono) return;
+    
+    currentChronology = chrono;
+    const newSettings = { ...settings, chronologyId };
+    setSettings(newSettings);
+    AsyncStorage.setItem(KEYS.SETTINGS, JSON.stringify(newSettings));
+    
+    // Réinitialiser les jalons atteints pour la nouvelle chronologie
+    setMilestonesReached([]);
+    triggeredRef.current.clear();
+    AsyncStorage.setItem(KEYS.MILESTONES, JSON.stringify([]));
+  }, [settings]);
 
   return {
     state,
@@ -245,49 +249,36 @@ export function usePedometer() {
     toggleWalking,
     reset,
     updateSettings,
+    addSimulatedSteps,
+    changeChronology,
   };
 }
 
-/**
- * Calcule la période actuelle en fonction de la distance
- */
 function calculateCurrentPeriod(currentDistance: number, totalDistance: number): PeriodInfo {
-  const milestones = milestonesData as Milestone[];
-  const yearsPerMeter = 1000000 / totalDistance;
-  const currentYears = currentDistance * yearsPerMeter;
-
-  // Trouver les jalons avant et après la position actuelle
   let beforeMilestone: Milestone | null = null;
   let afterMilestone: Milestone | null = null;
 
-  for (const milestone of milestones) {
-    if (milestone.distance_m <= currentDistance) {
-      beforeMilestone = milestone;
-    }
-    if (milestone.distance_m > currentDistance && !afterMilestone) {
-      afterMilestone = milestone;
-    }
+  for (const m of getMilestones()) {
+    const scaled = scaleDistance(m.distance_m, totalDistance);
+    if (scaled <= currentDistance) beforeMilestone = m;
+    if (scaled > currentDistance && !afterMilestone) afterMilestone = m;
   }
 
-  const name = beforeMilestone?.title || "Début de la chronologie";
-  const startYear = beforeMilestone?.start_date.year || 1000000;
-  const endYear = afterMilestone?.start_date.year || 0;
-
   return {
-    name,
-    startYear,
-    endYear,
-    era: beforeMilestone?.start_date.era || "BC",
+    name: beforeMilestone?.title || "Début de la chronologie",
+    startYear: beforeMilestone?.start_date.year || 1000000,
+    endYear: afterMilestone?.start_date.year || 0,
+    era: (beforeMilestone?.start_date.era || "BC") as "BC" | "AD",
     description: beforeMilestone?.intro || "",
     nextMilestone: afterMilestone || null,
-    distanceToNext: afterMilestone ? afterMilestone.distance_m - currentDistance : 0,
+    distanceToNext: afterMilestone
+      ? scaleDistance(afterMilestone.distance_m, totalDistance) - currentDistance
+      : 0,
   };
 }
 
-/**
- * Trouve le prochain jalon à atteindre
- */
-function findNextMilestone(currentDistance: number): Milestone | null {
-  const milestones = milestonesData as Milestone[];
-  return milestones.find((m) => m.distance_m > currentDistance) || null;
+function findNextMilestone(currentDistance: number, totalDistance: number): Milestone | null {
+  return getMilestones().find((m: Milestone) =>
+    scaleDistance(m.distance_m, totalDistance) > currentDistance
+  ) || null;
 }
