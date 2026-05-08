@@ -123,7 +123,7 @@ Les jalons sont extraits du CSV de la CAM officielle et incluent :
 
 ## 📝 Licence
 
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+Business Source License 1.1
 
 ## 🙏 Crédits
 
